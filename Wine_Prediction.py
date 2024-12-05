@@ -2,15 +2,18 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
-from textblob import TextBlob
 from wordcloud import WordCloud, STOPWORDS
+import matplotlib.pyplot as plt
+from sklearn.feature_extraction.text import TfidfVectorizer
 
+# Project 3
 def show_wine_predictions():
     # Input and prediction section 
     st.subheader('Prediction (1: Positive, 0: Negative)')
