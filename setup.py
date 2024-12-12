@@ -12,7 +12,8 @@ setup(
         "scikit-learn",
         "plotly",
         "nltk",
-        "wordcloud"
+        "wordcloud",
+        "gdown"  
     ],
     entry_points={
         "console_scripts": [
@@ -20,3 +21,4 @@ setup(
         ],
     },
 )
+
