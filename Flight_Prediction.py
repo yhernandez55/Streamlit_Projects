@@ -1,28 +1,31 @@
-# Import libraries
-import os
-import joblib
 import pandas as pd
+import joblib
 import streamlit as st
-import plotly.express as px
 import gdown
+import os
+import plotly.express as px
 
-# Download necessary files
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import Pipeline
+
 def download_models():
-    # XGB_Model_Flight.pkl
+    # XGB Model
     if not os.path.exists('Streamlit_Projects/pickled_data/XGB_Model_Flight.pkl'):
-        gdown.download("https://drive.google.com/uc?id=1LE9B7pxpNvvwcQv0SCTuRcIUUn6fAe2o", 
+        gdown.download("https://drive.google.com/uc?id=1E7T5wc41VGcXWZXnXb-ES9pTgwtSU9_W", 
                        "Streamlit_Projects/pickled_data/XGB_Model_Flight.pkl", quiet=False)
     
-    # Airline_Clean_Dataset.csv
-    if not os.path.exists('Streamlit_Projects/DataSets/Airline_Clean_Dataset.csv'):
-        gdown.download("https://drive.google.com/uc?id=1hZwlOyubjj5RembXMu4a5BMoYmQBw5o_", 
-                       "Streamlit_Projects/DataSets/Airline_Clean_Dataset.csv", quiet=False)
-    
-    # Evaluation_Metrics_Flight.pkl
+    # Evaluation Metrics
     if not os.path.exists('Streamlit_Projects/pickled_data/Evaluation_Metrics_Flight.pkl'):
         gdown.download("https://drive.google.com/uc?id=1NE_iA88FlySd5Lwk3dr4w9IIV-TfxkCO", 
                        "Streamlit_Projects/pickled_data/Evaluation_Metrics_Flight.pkl", quiet=False)
+    
+    # Dataset
+    if not os.path.exists('Streamlit_Projects/DataSets/Airline_Clean_Dataset.csv'):
+        gdown.download("https://drive.google.com/uc?id=1hZwlOyubjj5RembXMu4a5BMoYmQBw5o_", 
+                       "Streamlit_Projects/DataSets/Airline_Clean_Dataset.csv", quiet=False)
 
+    
 # Run the function to download files
 download_models()
 
@@ -34,7 +37,7 @@ def show_flight_prediction():
     pipeline_path = os.path.join('Streamlit_Projects', 'pickled_data', 'XGB_Model_Flight.pkl')
     df_path = os.path.join('Streamlit_Projects', 'DataSets', 'Airline_Clean_Dataset.csv')
     try:
-        pipeline = joblib.load(pipeline_path)
+        pipeline = joblib.load(pipeline_path)  # Load the pipeline (model + preprocessor)
         df = pd.read_csv(df_path)
     except FileNotFoundError:
         st.error("Required files are missing. Please check the download links or paths.")
@@ -66,12 +69,22 @@ def show_flight_prediction():
             'days_left': [days_left]
         })
 
-        # Display input data
-        st.write("Input Data for Prediction:", user_input_data)
+        # Ensure that the user input data matches the training data column order and structure
+        try:
+            user_input_transformed = pipeline.named_steps['preprocessor'].transform(user_input_data)
+            # Get column names after transformation to match model expectations
+            transformed_columns = pipeline.named_steps['preprocessor'].get_feature_names_out()
+            # Create a DataFrame with transformed data to pass into the model for prediction
+            user_input_transformed_df = pd.DataFrame(user_input_transformed, columns=transformed_columns)
 
-        # Make prediction
-        prediction = pipeline.predict(user_input_data)
-        st.success(f'The predicted price of the flight is: ${prediction[0]:.2f}')
+            # Display input data
+            st.write("Input Data for Prediction:", user_input_data)
+
+            # Make prediction using the pipeline
+            prediction = pipeline.predict(user_input_transformed_df)
+            st.success(f'The predicted price of the flight is: ${prediction[0]:.2f}')
+        except Exception as e:
+            st.error(f"Error during prediction: {e}")
 
     # Dataframe and Statistics
     st.subheader('Flight Data')

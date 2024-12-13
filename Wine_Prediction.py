@@ -1,113 +1,140 @@
-# Import libraries
+# import libraries
 import os
-import joblib
-import gdown
-import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-from nltk.corpus import stopwords
+import nltk
 from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from wordcloud import WordCloud
-import nltk
+import joblib
+import gdown
+import matplotlib.pyplot as plt
+import streamlit as st
 
-# Download NLTK data
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
+# Download necessary NLTK resources
+nltk.download("punkt")
+nltk.download("stopwords")
+nltk.download("wordnet")
 
-# Download models and data files if missing
-def download_Wine_models():
-    # Wine_model.pkl
-    if not os.path.exists('Streamlit_Projects/pickled_data/Wine_model.pkl'):
-        gdown.download("https://drive.google.com/uc?id=1l2bzhI4XwTRvNJ2RLuGPrJJ-YH4b0Uvr", 
-                       "Streamlit_Projects/pickled_data/Wine_model.pkl", quiet=False)
-    
-    # tfidf_Vectorizer_Wine.pkl
-    if not os.path.exists('Streamlit_Projects/pickled_data/tfidf_Vectorizer_Wine.pkl'):
-        gdown.download("https://drive.google.com/uc?id=1rvouN_GRd2BX4BvRnviSP0QmBAHOHYLl", 
-                       "Streamlit_Projects/pickled_data/tfidf_Vectorizer_Wine.pkl", quiet=False)
-    
-    # Evaluation_Metrics_Wine.pkl
-    if not os.path.exists('Streamlit_Projects/pickled_data/Evaluation_Metrics_Wine.pkl'):
-        gdown.download("https://drive.google.com/uc?id=1aCG-X8SE4teMbvaWaSPr5oE9QzB560hd", 
-                       "Streamlit_Projects/pickled_data/Evaluation_Metrics_Wine.pkl", quiet=False)
-    
-    # winemag-data-130k-v2.csv
-    if not os.path.exists('Streamlit_Projects/DataSets/winemag-data-130k-v2.csv'):
-        gdown.download("https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS", 
-                       "Streamlit_Projects/DataSets/winemag-data-130k-v2.csv", quiet=False)
+# Base directory setup
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Run the function to download necessary files
-download_Wine_models()
+# File paths
+model_path = os.path.join(base_dir, 'Streamlit_Projects', 'pickled_data', 'Wine_model.pkl')
+tfidf_path = os.path.join(base_dir, 'Streamlit_Projects', 'pickled_data', 'tfidf_Vectorizer_Wine.pkl')
+eval_metrics_path = os.path.join(base_dir, 'Streamlit_Projects', 'pickled_data', 'Evaluation_Metrics_Wine.pkl')
+cleaned_df_path = os.path.join(base_dir, 'Streamlit_Projects', 'pickled_data', 'Cleaned_Wine_df.plk')
+data_path = os.path.join(base_dir, 'Streamlit_Projects', 'DataSets', 'winemag-data-130k-v2.csv')
 
-# Wine Predictions Project
+# File download URLs
+file_urls = {
+    model_path: "https://drive.google.com/uc?id=1l2bzhI4XwTRvNJ2RLuGPrJJ-YH4b0Uvr",
+    tfidf_path: "https://drive.google.com/uc?id=1rvouN_GRd2BX4BvRnviSP0QmBAHOHYLl",
+    eval_metrics_path: "https://drive.google.com/uc?id=1aCG-X8SE4teMbvaWaSPr5oE9QzB560hd",
+    data_path: "https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS",
+    cleaned_df_path: "https://drive.google.com/uc?id=1CC_eXKfbw9_WZGwFM23KFETxozppbLIn"
+}
+
+# Function to download files from Google Drive
+def download_files():
+    for file_path, url in file_urls.items():
+        if not os.path.exists(file_path):
+            st.write(f"Downloading {os.path.basename(file_path)}...")
+            gdown.download(url, file_path, quiet=False)
+
+# Run the file download function
+download_files()
+
+# Function to preprocess text input
+def preprocess_text(text):
+    stop_words = set(stopwords.words("english")).union({",", "."})
+    lemmatizer = WordNetLemmatizer()
+    tokens = word_tokenize(text)  # Tokenize
+    tokens = [word.lower() for word in tokens if word.lower() not in stop_words]  # Remove stopwords
+    lemmatized_tokens = [lemmatizer.lemmatize(token) for token in tokens]  # Lemmatize
+    return ' '.join(lemmatized_tokens)  # Join tokens back into a string
+
+# Main function to display wine prediction page
 def show_wine_predictions():
-    st.header("Wine Reviews Prediction")
-    st.subheader("Prediction (1: Positive, 0: Negative)")
-
-    # Load model and TF-IDF vectorizer
-    wine_model_path = os.path.join("Streamlit_Projects", "pickled_data", "Wine_model.pkl")
-    tfidf_vectorizer_path = os.path.join("Streamlit_Projects", "pickled_data", "tfidf_Vectorizer_Wine.pkl")
+    """
+    This function will display the wine sentiment prediction page and handle the wine review input,
+    preprocess the review, and make predictions using a pre-trained model.
+    """
+    # Load required resources
     try:
-        wine_model = joblib.load(wine_model_path)
-        tfidf_vectorizer = joblib.load(tfidf_vectorizer_path)
-    except FileNotFoundError:
-        st.error("Required files are missing. Please check the download links or paths.") # checks to make sure there downloaded
+        wine_model = joblib.load(model_path)
+        tfidf_vectorizer = joblib.load(tfidf_path)
+        accuracy, class_report = joblib.load(eval_metrics_path)
+        df_cleaned = joblib.load(cleaned_df_path)
+    except Exception as e:
+        st.error(f"Failed to load files: {e}")
         return
 
-    # Input and prediction
-    input_review = st.text_input("Enter your wine review:")
+    # Streamlit App Title
+    st.title("Wine Review Sentiment Analysis")
+
+    # Input and prediction section
+    st.subheader("Prediction (1: Positive, 0: Negative)")
+    input_review = st.text_input("Enter your wine review please")
+
     if st.button("Wine Predict"):
-        def preprocess_text(text):
-            stop_words = set(stopwords.words('english')).union({',', '.'})
-            lemmatizer = WordNetLemmatizer()
-            tokens = word_tokenize(text)
-            tokens = [word.lower() for word in tokens if word.lower() not in stop_words]
-            lemmatized_tokens = [lemmatizer.lemmatize(token) for token in tokens]
-            return ' '.join(lemmatized_tokens)
-
-        preprocessed_review = preprocess_text(input_review)
-        input_review_transformed = tfidf_vectorizer.transform([preprocessed_review])
-        prediction = wine_model.predict(input_review_transformed)
-
-        if prediction[0] == 1:
-            st.success("This is a Positive review!")
+        if input_review.strip():  # Check if the input is not empty
+            # Preprocess input review
+            preprocessed_review = preprocess_text(input_review)
+            # Transform with TF-IDF
+            input_review_transformed = tfidf_vectorizer.transform([preprocessed_review])
+            # Predict sentiment
+            wine_pred = wine_model.predict(input_review_transformed)
+            # Display prediction result
+            if wine_pred[0] == 1:
+                st.success("This is a Positive review!")
+            else:
+                st.warning("This is a Negative review!")
         else:
-            st.warning("This is a Negative review.")
+            st.warning("Please enter a valid review.")
 
-    # Load and display raw dataset
-    st.subheader("Wine Dataset (Raw)")
-    df_path = os.path.join("Streamlit_Projects", "DataSets", "winemag-data-130k-v2.csv")
+    # Header and data display
+    st.header("Wine Predictions")
+    st.subheader("Predicting Positive Reviews")
+
+    # Load raw data
     try:
-        df = pd.read_csv(df_path)
-        df = df[['description', 'title']]  # Keep only relevant columns
+        df = pd.read_csv(data_path, encoding='ISO-8859-1')
+        st.subheader("Raw Data (Uncleaned)")
         st.dataframe(df.head())
-    except FileNotFoundError:
-        st.error("Wine dataset is missing. Please check the download link.") # checks to make sure there downloaded
+    except Exception as e:
+        st.error(f"Failed to load raw data: {e}")
 
-    # Create and display WordCloud
+    # Cleaned data display
+    st.subheader("Cleaned Dataframe")
+    try:
+        df_cleaned = df_cleaned.drop(['Unnamed: 0', 'country', 'designation', 'points', 
+                                      'price', 'province', 'region_1', 'region_2', 'variety'], axis=1)
+        st.dataframe(df_cleaned.head())
+    except Exception as e:
+        st.error(f"Error in displaying cleaned dataframe: {e}")
+
+    # WordCloud of reviews
     st.subheader("WordCloud of Reviews")
     try:
-        df_cleaned_path = os.path.join("Streamlit_Projects", "pickled_data", "Cleaned_Wine_df.plk")
-        df_cleaned = joblib.load(df_cleaned_path)
-        all_text = ' '.join(df_cleaned['Cleaned_Lemma_Description'])
-        wordcloud = WordCloud(width=800, height=400, random_state=1).generate(all_text)
+        df_cleaned['Cleaned_Lemma_Description'] = df_cleaned['Cleaned_Lemma_Description'].apply(
+            lambda x: ' '.join(x) if isinstance(x, list) else x)
+        text_columns = ' '.join(df_cleaned['Cleaned_Lemma_Description'])
+        wordcloud = WordCloud(width=800, height=400, random_state=1).generate(text_columns)
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(8, 8))
         ax.imshow(wordcloud, interpolation='bilinear')
-        ax.axis("off")
+        ax.axis('off')
         st.pyplot(fig)
-    except FileNotFoundError:
-        st.warning("Cleaned data for WordCloud is unavailable.") # checks to make sure there downloaded
+    except Exception as e:
+        st.error(f"Error generating WordCloud: {e}")
 
-    # Display evaluation metrics
+    # Model evaluation metrics
     st.subheader("Model Evaluation Metrics")
-    eval_metrics_path = os.path.join("Streamlit_Projects", "pickled_data", "Evaluation_Metrics_Wine.pkl")
     try:
-        accuracy, class_report = joblib.load(eval_metrics_path)
         st.write(f"Accuracy: {accuracy:.2f}")
         st.text("Classification Report:")
         st.text(class_report)
-    except FileNotFoundError:
-        st.error("Evaluation metrics file is missing. Please check the download link.") # checks to make sure there downloaded
+    except Exception as e:
+        st.error(f"Error displaying evaluation metrics: {e}")
+
