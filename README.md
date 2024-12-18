@@ -6,6 +6,6 @@ This repository has three mini projects where they interact with the user. Each 
        [Spam_Prediction](Spam_Prediction.py)
 
   3. Predicting flight prices based on nine features out of the 10 other features:
-        []()
+        [Flight_Prediction](Flight_Prediction.py)
   4. Predicting a wine review is considered a positive review or a negative:
         [Wine_Prediction](Wine_Prediction.py)
