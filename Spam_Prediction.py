@@ -10,19 +10,19 @@ import matplotlib.pyplot as plt
 # Download models and data files if missing
 def download_Spam_models():
     # Spam_Model.pkl
-    if not os.path.exists('Streamlit_Projects/pickled_data/Spam_Model.pkl'):
+    if not os.path.exists('pickled_data/Spam_Model.pkl'):
         gdown.download("https://drive.google.com/uc?id=1PZ7BbeZXUQewkveUXXqfC2UzTHpULved", "Streamlit_Projects/pickled_data/Spam_Model.pkl", quiet=False)
     
     # tfidf_Vectorizer_Spam.pkl
-    if not os.path.exists('Streamlit_Projects/pickled_data/tfidf_Vectorizer_Spam.pkl'):
+    if not os.path.exists('pickled_data/tfidf_Vectorizer_Spam.pkl'):
         gdown.download("https://drive.google.com/uc?id=1PQrkTu0mxoN8nGvztcbxsTWXS_4UrCfU", "Streamlit_Projects/pickled_data/tfidf_Vectorizer_Spam.pkl", quiet=False)
     
     # spam.csv
-    if not os.path.exists('Streamlit_Projects/DataSets/spam.csv'):
+    if not os.path.exists('DataSets/spam.csv'):
         gdown.download("https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS", "Streamlit_Projects/DataSets/spam.csv", quiet=False)
     
     # Evaluation_Metrics_Spam.pkl
-    if not os.path.exists('Streamlit_Projects/pickled_data/Evaluation_Metrics_Spam.pkl'):
+    if not os.path.exists('pickled_data/Evaluation_Metrics_Spam.pkl'):
         gdown.download("https://drive.google.com/uc?id=12hbzIHJJosEzhlNb3tSj3mQY7j0oEvwo", "Streamlit_Projects/pickled_data/Evaluation_Metrics_Spam.pkl", quiet=False)
 
 
@@ -36,8 +36,8 @@ def show_spam_project():
     st.subheader("Spam is 1 and ham is 0")
 
     # Load model and vectorizer using relative paths
-    spam_model_path = os.path.join("Streamlit_Projects", "pickled_data", "Spam_Model.pkl")
-    tfidf_path = os.path.join("Streamlit_Projects", "pickled_data", "tfidf_Vectorizer_Spam.pkl")
+    spam_model_path = os.path.join("pickled_data", "Spam_Model.pkl")
+    tfidf_path = os.path.join("pickled_data", "tfidf_Vectorizer_Spam.pkl")
     try:
         spam_model = joblib.load(spam_model_path)
         tfidf = joblib.load(tfidf_path)
@@ -58,7 +58,7 @@ def show_spam_project():
             st.write(f"The predicted message is: {pred[0]}")
 
     # Data loading and displaying
-    df_path = os.path.join("Streamlit_Projects", "DataSets", "spam.csv")
+    df_path = os.path.join("DataSets", "spam.csv")
     try:
         df = pd.read_csv(df_path, sep=',', encoding='latin-1')
         df = df.drop(['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], axis=1)
@@ -81,7 +81,7 @@ def show_spam_project():
     st.pyplot(fig)
 
     # Model evaluation metrics
-    eval_metrics_path = os.path.join("Streamlit_Projects", "pickled_data", "Evaluation_Metrics_Spam.pkl")
+    eval_metrics_path = os.path.join("pickled_data", "Evaluation_Metrics_Spam.pkl")
     try:
         accuracy, class_report = joblib.load(eval_metrics_path)
         st.subheader("Model Evaluation Metrics")

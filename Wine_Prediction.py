@@ -20,11 +20,11 @@ nltk.download("wordnet")
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 # File paths
-model_path = os.path.join(base_dir, 'Streamlit_Projects', 'pickled_data', 'Wine_model.pkl')
-tfidf_path = os.path.join(base_dir, 'Streamlit_Projects', 'pickled_data', 'tfidf_Vectorizer_Wine.pkl')
-eval_metrics_path = os.path.join(base_dir, 'Streamlit_Projects', 'pickled_data', 'Evaluation_Metrics_Wine.pkl')
-cleaned_df_path = os.path.join(base_dir, 'Streamlit_Projects', 'pickled_data', 'Cleaned_Wine_df.plk')
-data_path = os.path.join(base_dir, 'Streamlit_Projects', 'DataSets', 'winemag-data-130k-v2.csv')
+model_path = os.path.join(base_dir, 'pickled_data', 'Wine_model.pkl')
+tfidf_path = os.path.join(base_dir,'pickled_data', 'tfidf_Vectorizer_Wine.pkl')
+eval_metrics_path = os.path.join(base_dir, 'pickled_data', 'Evaluation_Metrics_Wine.pkl')
+cleaned_df_path = os.path.join(base_dir, 'pickled_data', 'Cleaned_Wine_df.plk')
+data_path = os.path.join(base_dir, 'DataSets', 'winemag-data-130k-v2.csv')
 
 # File download URLs
 file_urls = {
