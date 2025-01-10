@@ -9,3 +9,5 @@ This repository has three mini projects where they interact with the user. Each 
         [Flight_Prediction](Flight_Prediction.py)
   4. Predicting a wine review is considered a positive review or a negative:
         [Wine_Prediction](Wine_Prediction.py)
+
+There is a new branch called Modeling-Notebooks where each project shows what the process was to efficiently predict user inputs.
