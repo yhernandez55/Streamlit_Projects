@@ -1,13 +1,47 @@
 # import libraries:
+import os
 import streamlit as st
 import pandas as pd
 import joblib
 import plotly.express as px
+import gdown
+
+# Base directory setup
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Define folder paths
+pickled_data_folder = os.path.join(base_dir, 'pickled_data')
+datasets_folder = os.path.join(base_dir, 'DataSets')
+
+# Ensure the required folders exist
+os.makedirs(pickled_data_folder, exist_ok=True)
+os.makedirs(datasets_folder, exist_ok=True)
+
+# File paths
+file_paths = {
+    "xgb_pipeline_Flight.pkl": os.path.join(pickled_data_folder, 'xgb_pipeline_Flight.pkl'),
+    "Eval_Metrics_Flight.pkl": os.path.join(pickled_data_folder, 'Eval_Metrics_Flight.pkl'),
+    "Airline_Clean_Dataset.csv": os.path.join(datasets_folder, 'Airline_Clean_Dataset.csv')
+}
+
+# File download URLs
+file_urls = {
+    "xgb_pipeline_Flight.pkl": "https://drive.google.com/uc?id=10pWyBmDDgU0fUL6BBkbP4QZyvSo3zprn",
+    "Eval_Metrics_Flight.pkl": "https://drive.google.com/uc?id=1nE6NlcdCDATh2PSf6aZ3IO4n3-sJANaC",
+    "Airline_Clean_Dataset.csv": "https://drive.google.com/uc?id=1hZwlOyubjj5RembXMu4a5BMoYmQBw5o_"
+}
+
+# Ensure files are downloaded
+for file_name, file_path in file_paths.items():
+    if not os.path.exists(file_path):
+        gdown.download(file_urls[file_name], file_path, quiet=False)
+
 
 def show_flight_prediction():
-    # Load the trained pipeline and dataset
-    pipeline = joblib.load('pickled_data/xgb_pipeline_Flight.pkl')  # Relative path
-    df = pd.read_csv('DataSets/Airline_Clean_Dataset.csv')  # Relative path
+    # Load the trained pipeline, eval metrics and dataset
+    pipeline = joblib.load(file_paths["xgb_pipeline_Flight.pkl"])
+    df = pd.read_csv(file_paths["Airline_Clean_Dataset.csv"])
+    eval_metrics = joblib.load(file_paths["Eval_Metrics_Flight.pkl"])
 
     # Header and dataset overview
     st.header('Predicting the Price of Flights')
@@ -75,9 +109,7 @@ def show_flight_prediction():
     # Load and display evaluation metrics
     st.subheader('Model Evaluation Metrics')
     try:
-        eval_metrics = joblib.load('pickled_data/Eval_Metrics_Flight.pkl')  # Relative path
         rmse_train, rmse_test, fittest = eval_metrics
-
         st.write(f"Root Mean Squared Error (Training): {rmse_train:.2f}")
         st.write(f"Root Mean Squared Error (Test): {rmse_test:.2f}")
         st.write(f"Model Fit Status: {fittest[1]} (Ratio: {fittest[0]})")

@@ -19,28 +19,46 @@ nltk.download("wordnet")
 # Base directory setup
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
+# Define folder paths
+pickled_data_folder = os.path.join(base_dir, 'pickled_data')
+datasets_folder = os.path.join(base_dir, 'DataSets')
+
+# Ensure the required folders exist
+os.makedirs(pickled_data_folder, exist_ok=True)
+os.makedirs(datasets_folder, exist_ok=True)
+
 # File paths
-model_path = os.path.join(base_dir, 'pickled_data', 'Wine_model.pkl')
-tfidf_path = os.path.join(base_dir,'pickled_data', 'tfidf_Vectorizer_Wine.pkl')
-eval_metrics_path = os.path.join(base_dir, 'pickled_data', 'Evaluation_Metrics_Wine.pkl')
-cleaned_df_path = os.path.join(base_dir, 'pickled_data', 'Cleaned_Wine_df.plk')
-data_path = os.path.join(base_dir, 'DataSets', 'winemag-data-130k-v2.csv')
+file_paths = {
+    "Wine_model.pkl": os.path.join(pickled_data_folder, 'Wine_model.pkl'),
+    "tfidf_Vectorizer_Wine.pkl": os.path.join(pickled_data_folder, 'tfidf_Vectorizer_Wine.pkl'),
+    "Evaluation_Metrics_Wine.pkl": os.path.join(pickled_data_folder, 'Evaluation_Metrics_Wine.pkl'),
+    "Cleaned_Wine_df.plk": os.path.join(pickled_data_folder, 'Cleaned_Wine_df.plk'),
+    "winemag-data-130k-v2.csv": os.path.join(datasets_folder, 'winemag-data-130k-v2.csv')
+}
 
 # File download URLs
 file_urls = {
-    model_path: "https://drive.google.com/uc?id=1l2bzhI4XwTRvNJ2RLuGPrJJ-YH4b0Uvr",
-    tfidf_path: "https://drive.google.com/uc?id=1rvouN_GRd2BX4BvRnviSP0QmBAHOHYLl",
-    eval_metrics_path: "https://drive.google.com/uc?id=1aCG-X8SE4teMbvaWaSPr5oE9QzB560hd",
-    data_path: "https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS",
-    cleaned_df_path: "https://drive.google.com/uc?id=1CC_eXKfbw9_WZGwFM23KFETxozppbLIn"
+    "Wine_model.pkl": "https://drive.google.com/uc?id=1Ttx4EkgAAmqesIMBZw5wUQTlKik-l867",
+    "tfidf_Vectorizer_Wine.pkl": "https://drive.google.com/uc?id=1zRRlf24PgYjWBtH7dPk39CDiAHCf4Ki3",
+    "Evaluation_Metrics_Wine.pkl": "https://drive.google.com/uc?id=1BfgB_bO_9DUE-CyTqI3FdToKpqGKOAIK",
+    "Cleaned_Wine_df.plk": " https://drive.google.com/uc?id=1fjIrotKhARgelSLh0SuGQQ_xxf63nya5",
+    "winemag-data-130k-v2.csv": "https://drive.google.com/uc?id=1qd2rIjiqfx9dZ1q_aufpkwfZsl7u3DQb"
 }
+
 
 # Function to download files from Google Drive
 def download_files():
-    for file_path, url in file_urls.items():
+    for file_name, url in file_urls.items():
+        file_path = file_paths[file_name]
         if not os.path.exists(file_path):
-            st.write(f"Downloading {os.path.basename(file_path)}...")
-            gdown.download(url, file_path, quiet=False)
+            st.write(f"Downloading {file_name}...")
+            try:
+                gdown.download(url, file_path, quiet=False)
+                st.success(f"Downloaded {file_name}")
+            except Exception as e:
+                st.error(f"Failed to download {file_name}: {e}")
+        else:
+            st.write(f"{file_name} already exists.")
 
 # Run the file download function
 download_files()
@@ -62,10 +80,10 @@ def show_wine_predictions():
     """
     # Load required resources
     try:
-        wine_model = joblib.load(model_path)
-        tfidf_vectorizer = joblib.load(tfidf_path)
-        accuracy, class_report = joblib.load(eval_metrics_path)
-        df_cleaned = joblib.load(cleaned_df_path)
+        wine_model = joblib.load(file_paths["Wine_model.pkl"])
+        tfidf_vectorizer = joblib.load(file_paths["tfidf_Vectorizer_Wine.pkl"])
+        accuracy, class_report = joblib.load(file_paths["Evaluation_Metrics_Wine.pkl"])
+        df_cleaned = joblib.load(file_paths["Cleaned_Wine_df.plk"])
     except Exception as e:
         st.error(f"Failed to load files: {e}")
         return
@@ -99,7 +117,7 @@ def show_wine_predictions():
 
     # Load raw data
     try:
-        df = pd.read_csv(data_path, encoding='ISO-8859-1')
+        df = pd.read_csv(file_paths["winemag-data-130k-v2.csv"], encoding='ISO-8859-1')
         st.subheader("Raw Data (Uncleaned)")
         st.dataframe(df.head())
     except Exception as e:
@@ -138,3 +156,6 @@ def show_wine_predictions():
     except Exception as e:
         st.error(f"Error displaying evaluation metrics: {e}")
 
+    # Display predictions
+    if __name__ == "__main__":
+        show_wine_predictions()

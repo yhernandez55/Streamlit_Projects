@@ -6,45 +6,48 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Base directory setup
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Download models and data files if missing
-def download_Spam_models():
-    # Spam_Model.pkl
-    if not os.path.exists('pickled_data/Spam_Model.pkl'):
-        gdown.download("https://drive.google.com/uc?id=1PZ7BbeZXUQewkveUXXqfC2UzTHpULved", "Streamlit_Projects/pickled_data/Spam_Model.pkl", quiet=False)
-    
-    # tfidf_Vectorizer_Spam.pkl
-    if not os.path.exists('pickled_data/tfidf_Vectorizer_Spam.pkl'):
-        gdown.download("https://drive.google.com/uc?id=1PQrkTu0mxoN8nGvztcbxsTWXS_4UrCfU", "Streamlit_Projects/pickled_data/tfidf_Vectorizer_Spam.pkl", quiet=False)
-    
-    # spam.csv
-    if not os.path.exists('DataSets/spam.csv'):
-        gdown.download("https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS", "Streamlit_Projects/DataSets/spam.csv", quiet=False)
-    
-    # Evaluation_Metrics_Spam.pkl
-    if not os.path.exists('pickled_data/Evaluation_Metrics_Spam.pkl'):
-        gdown.download("https://drive.google.com/uc?id=12hbzIHJJosEzhlNb3tSj3mQY7j0oEvwo", "Streamlit_Projects/pickled_data/Evaluation_Metrics_Spam.pkl", quiet=False)
+# Define folder paths
+pickled_data_folder = os.path.join(base_dir, 'pickled_data')
+datasets_folder = os.path.join(base_dir, 'DataSets')
 
+# Ensure the required folders exist
+os.makedirs(pickled_data_folder, exist_ok=True)
+os.makedirs(datasets_folder, exist_ok=True)
 
-# Run the function to download necessary files
-download_Spam_models()
+# Define file paths
+file_paths = {
+    "Spam_Model.pkl": os.path.join(pickled_data_folder, "Spam_Model.pkl"),
+    "tfidf_Vectorizer_Spam.pkl": os.path.join(pickled_data_folder, "tfidf_Vectorizer_Spam.pkl"),
+    "Evaluation_Metrics_Spam.pkl": os.path.join(pickled_data_folder, "Evaluation_Metrics_Spam.pkl"),
+    "spam.csv": os.path.join(datasets_folder, "spam.csv")
+}
 
+# Define file URLs for downloading
+file_urls = {
+    "Spam_Model.pkl": "https://drive.google.com/uc?id=17h6CL_3m22WtBrJQX7c5JMOhbbED1gNr",
+    "tfidf_Vectorizer_Spam.pkl": "https://drive.google.com/uc?id=1Rp7KPNSO6q8KgUfSVQSxgVaryNmZn59k",
+    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=19AN9ZyqblDmwb3VzONajVkCVHi1fn-uZ",
+    "spam.csv": "https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS"
+}
 
 # Project-1 (Spam Prediction)
 def show_spam_project():
     st.header("Finding if a Message is a Spam")
     st.subheader("Spam is 1 and ham is 0")
 
-    # Load model and vectorizer using relative paths
-    spam_model_path = os.path.join("pickled_data", "Spam_Model.pkl")
-    tfidf_path = os.path.join("pickled_data", "tfidf_Vectorizer_Spam.pkl")
-    try:
-        spam_model = joblib.load(spam_model_path)
-        tfidf = joblib.load(tfidf_path)
-    except FileNotFoundError:
-        st.error("Required files are missing. Please check the download links or paths.") # checks to make sure there downloaded
-        return
-
+    # Ensure files are available or download them
+    for file_name, file_path in file_paths.items():
+        if not os.path.exists(file_path):
+            gdown.download(file_urls[file_name], file_path, quiet=False)
+    
+    # Assume all files are downloaded
+    spam_model = joblib.load(file_paths["Spam_Model.pkl"])
+    tfidf = joblib.load(file_paths["tfidf_Vectorizer_Spam.pkl"])
+    eval_metrics = joblib.load(file_paths["Evaluation_Metrics_Spam.pkl"])
+ 
     # Making prediction
     input_message = st.text_input("Enter your message please")
     if st.button('Predict'):
@@ -81,12 +84,11 @@ def show_spam_project():
     st.pyplot(fig)
 
     # Model evaluation metrics
-    eval_metrics_path = os.path.join("pickled_data", "Evaluation_Metrics_Spam.pkl")
+    st.subheader("Model Evaluation Metrics")
     try:
-        accuracy, class_report = joblib.load(eval_metrics_path)
-        st.subheader("Model Evaluation Metrics")
+        accuracy, class_report = eval_metrics
         st.write(f"Accuracy: {accuracy:.2f}")
         st.text("Classification Report:")
         st.text(class_report)
-    except FileNotFoundError:
-        st.error("Evaluation metrics file is missing. Please check the download link.") # checks to make sure there downloaded
+    except Exception as e:
+        st.error(f"Error displaying evaluation metrics: {e}")

@@ -3,7 +3,7 @@ Streamlit_Projects/
 
 # Ignore dynamically fetched data/models
 Streamlit_Projects/pickled_data/
-Streamlit_Projects/DataSets/
+# Streamlit_Projects/DataSets/
 
 # Do NOT ignore critical files for testing purposes
 !Streamlit_Projects/pickled_data/Spam_Model.pkl

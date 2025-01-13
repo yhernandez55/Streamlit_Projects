@@ -22,3 +22,4 @@ elif choice == "Flight Prediction":
     Flight_Prediction.show_flight_prediction()  # Call the function from Flight_Prediction.py
 elif choice == "Wine Predictions":
     Wine_Prediction.show_wine_predictions()  # Call the function from Wine_Prediction.py
+
