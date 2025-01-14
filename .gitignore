@@ -1,20 +1,34 @@
-# Ignore symbolic links
-Streamlit_Projects/
+# for the main branch:
 
-# Ignore dynamically fetched data/models
-Streamlit_Projects/pickled_data/
-# Streamlit_Projects/DataSets/
+# Ignore everything by default
+*
 
-# Do NOT ignore critical files for testing purposes
-!Streamlit_Projects/pickled_data/Spam_Model.pkl
-!Streamlit_Projects/pickled_data/tfidf_Vectorizer_Spam.pkl
-!Streamlit_Projects/pickled_data/Evaluation_Metrics_Spam.pkl
-!Streamlit_Projects/pickled_data/XGB_Model_Flight.pkl
-!Streamlit_Projects/pickled_data/Evaluation_Metrics_Flight.pkl
-!Streamlit_Projects/pickled_data/Wine_model.pkl
-!Streamlit_Projects/pickled_data/tfidf_Vectorizer_Wine.pkl
-!Streamlit_Projects/pickled_data/Evaluation_Metrics_Wine.pkl
+# Track Python files
+!*.py
 
-# Ignore all CSV files except testing datasets
-*.csv
-!Streamlit_Projects/DataSets/test_data.csv  # Example: Explicitly track this if necessary
+# Track images/ directory
+!images/
+
+# Track requirements.txt
+!requirements.txt
+
+# Track .gitattributes
+!.gitattributes
+
+# Track .DS_Store
+!.DS_Store
+
+# Track .devcontainer/ directory
+!.devcontainer/
+
+# Track README.md
+!README.md
+
+# Track __pycache__/ directory
+!__pycache__/
+
+# Ignore the pickled_data/ folder
+pickled_data/
+
+# Ignore the DataSets/ folder
+DataSets/
