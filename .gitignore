@@ -1,20 +1,21 @@
-# Ignore symbolic links
-Streamlit_Projects/
+# For the Modeling branch:
 
-# Ignore dynamically fetched data/models
-Streamlit_Projects/pickled_data/
-# Streamlit_Projects/DataSets/
+# Ignore everything by default
+*
 
-# Do NOT ignore critical files for testing purposes
-!Streamlit_Projects/pickled_data/Spam_Model.pkl
-!Streamlit_Projects/pickled_data/tfidf_Vectorizer_Spam.pkl
-!Streamlit_Projects/pickled_data/Evaluation_Metrics_Spam.pkl
-!Streamlit_Projects/pickled_data/XGB_Model_Flight.pkl
-!Streamlit_Projects/pickled_data/Evaluation_Metrics_Flight.pkl
-!Streamlit_Projects/pickled_data/Wine_model.pkl
-!Streamlit_Projects/pickled_data/tfidf_Vectorizer_Wine.pkl
-!Streamlit_Projects/pickled_data/Evaluation_Metrics_Wine.pkl
+# Track the following model-related folders
+!Flight Model Notebooks/
+!Spam Model Notebooks/
+!Wine Model Notebooks/
 
-# Ignore all CSV files except testing datasets
-*.csv
-!Streamlit_Projects/DataSets/test_data.csv  # Example: Explicitly track this if necessary
+# Track .DS_Store (for branch-specific needs)
+!.DS_Store
+
+# Track .devcontainer/ directory
+!.devcontainer/
+
+# Track .gitattributes
+!.gitattributes
+
+# Track README.md
+!README.md
