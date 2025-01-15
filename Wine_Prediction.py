@@ -41,7 +41,7 @@ file_urls = {
     "Wine_model.pkl": "https://drive.google.com/uc?id=1Ttx4EkgAAmqesIMBZw5wUQTlKik-l867",
     "tfidf_Vectorizer_Wine.pkl": "https://drive.google.com/uc?id=1zRRlf24PgYjWBtH7dPk39CDiAHCf4Ki3",
     "Evaluation_Metrics_Wine.pkl": "https://drive.google.com/uc?id=1BfgB_bO_9DUE-CyTqI3FdToKpqGKOAIK",
-    "Cleaned_Wine_df.plk": " https://drive.google.com/uc?id=1fjIrotKhARgelSLh0SuGQQ_xxf63nya5",
+    "Cleaned_Wine_df.plk": "https://drive.google.com/uc?id=1fjIrotKhARgelSLh0SuGQQ_xxf63nya5",
     "winemag-data-130k-v2.csv": "https://drive.google.com/uc?id=1qd2rIjiqfx9dZ1q_aufpkwfZsl7u3DQb"
 }
 
@@ -53,12 +53,15 @@ def download_files():
         if not os.path.exists(file_path):
             st.write(f"Downloading {file_name}...")
             try:
-                gdown.download(url, file_path, quiet=False)
+                result = gdown.download(url, file_path, quiet=False)
+                if result is None:
+                    raise ValueError(f"Failed to download {file_name}: URL may be invalid or inaccessible.")
                 st.success(f"Downloaded {file_name}")
             except Exception as e:
                 st.error(f"Failed to download {file_name}: {e}")
         else:
             st.write(f"{file_name} already exists.")
+
 
 # Run the file download function
 download_files()
