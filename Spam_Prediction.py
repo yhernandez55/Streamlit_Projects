@@ -30,8 +30,7 @@ file_paths = {
 file_urls = {
     "Spam_Model.pkl": "https://drive.google.com/uc?id=17h6CL_3m22WtBrJQX7c5JMOhbbED1gNr",
     "tfidf_Vectorizer_Spam.pkl": "https://drive.google.com/uc?id=1Rp7KPNSO6q8KgUfSVQSxgVaryNmZn59k",
-    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=19AN9ZyqblDmwb3VzONajVkCVHi1fn-uZ",
-    "spam.csv": "https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS"
+    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=19AN9ZyqblDmwb3VzONajVkCVHi1fn-uZ"
 }
 
 # Project-1 (Spam Prediction)
@@ -47,6 +46,7 @@ def show_spam_project():
     # Assume all files are downloaded
     spam_model = joblib.load(file_paths["Spam_Model.pkl"])
     tfidf = joblib.load(file_paths["tfidf_Vectorizer_Spam.pkl"])
+    assert hasattr(tfidf, 'idf_'), "TF-IDF Vectorizer is not fitted!"
     eval_metrics = joblib.load(file_paths["Evaluation_Metrics_Spam.pkl"])
  
     # Making prediction
