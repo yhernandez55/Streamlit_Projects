@@ -31,15 +31,24 @@ file_urls = {
     "Airline_Clean_Dataset.csv": "https://drive.google.com/uc?id=1hZwlOyubjj5RembXMu4a5BMoYmQBw5o_"
 }
 
-# Use this to download the files with gdown
-for file_name, file_url in file_urls.items():
+# Function to download the files using gdown
+def download_file(url, destination):
     try:
-        file_path = file_paths[file_name]  # Define file path for each file
-        print(f"Downloading {file_name} from {file_url}...")
-        gdown.download(file_url, file_path, quiet=False)  # Attempt to download the file
-        print(f"{file_name} downloaded successfully.")  # Success message
+        # Try downloading the file using gdown
+        print(f"Attempting to download from {url} to {destination}...")
+        gdown.download(url, destination, quiet=False)
+        print(f"Download successful: {destination}")
     except Exception as e:
-        print(f"Error downloading {file_name}: {e}")  # If error occurs, print error message
+        print(f"Error downloading file: {e}")
+        raise
+
+# Ensure files are downloaded
+for file_name, file_path in file_paths.items():
+    if not os.path.exists(file_path):
+        download_file(file_urls[file_name], file_path)
+    else:
+        print(f"{file_name} already exists at {file_path}")
+
 
 def show_flight_prediction():
     # Load the trained pipeline, eval metrics and dataset
