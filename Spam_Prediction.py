@@ -6,6 +6,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Base directory setup
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,13 +44,23 @@ def show_spam_project():
     for file_name, file_path in file_paths.items():
         if not os.path.exists(file_path):
             gdown.download(file_urls[file_name], file_path, quiet=False)
-    
-    # Assume all files are downloaded
+
+    # Load the model, vectorizer, and evaluation metrics
     spam_model = joblib.load(file_paths["Spam_Model.pkl"])
     tfidf = joblib.load(file_paths["tfidf_Vectorizer_Spam.pkl"])
-    assert hasattr(tfidf, 'idf_'), "TF-IDF Vectorizer is not fitted!"
+
+    # In the case the vectorizer is not fitted, re-fit it
+    if not hasattr(tfidf, 'idf_'):
+        st.warning("TF-IDF Vectorizer is not fitted! Re-fitting...")
+        df = pd.read_csv(file_paths["spam.csv"], encoding="latin-1")
+        df = df.rename(columns={'v1': 'label', 'v2': 'message'})
+        df['label'] = df['label'].apply(lambda x: 1 if x == 'spam' else 0)
+        tfidf = TfidfVectorizer(stop_words=stopwords.words('english'))
+        X = tfidf.fit_transform(df['message'])
+        joblib.dump(tfidf, file_paths["tfidf_Vectorizer_Spam.pkl"])  # Save the re-fitted vectorizer
+
     eval_metrics = joblib.load(file_paths["Evaluation_Metrics_Spam.pkl"])
- 
+
     # Making prediction
     input_message = st.text_input("Enter your message please")
     if st.button('Predict'):
