@@ -24,19 +24,22 @@ file_paths = {
     "Airline_Clean_Dataset.csv": os.path.join(datasets_folder, 'Airline_Clean_Dataset.csv')
 }
 
-# File download URLs
+# Correct format URLs
 file_urls = {
     "xgb_pipeline_Flight.pkl": "https://drive.google.com/uc?id=10pWyBmDDgU0fUL6BBkbP4QZyvSo3zprn",
     "Eval_Metrics_Flight.pkl": "https://drive.google.com/uc?id=1nE6NlcdCDATh2PSf6aZ3IO4n3-sJANaC",
     "Airline_Clean_Dataset.csv": "https://drive.google.com/uc?id=1hZwlOyubjj5RembXMu4a5BMoYmQBw5o_"
 }
 
-
-# Ensure files are downloaded
-for file_name, file_path in file_paths.items():
-    if not os.path.exists(file_path):
-        gdown.download(file_urls[file_name], file_path, quiet=False)
-
+# Use this to download the files with gdown
+for file_name, file_url in file_urls.items():
+    try:
+        file_path = file_paths[file_name]  # Define file path for each file
+        print(f"Downloading {file_name} from {file_url}...")
+        gdown.download(file_url, file_path, quiet=False)  # Attempt to download the file
+        print(f"{file_name} downloaded successfully.")  # Success message
+    except Exception as e:
+        print(f"Error downloading {file_name}: {e}")  # If error occurs, print error message
 
 def show_flight_prediction():
     # Load the trained pipeline, eval metrics and dataset
