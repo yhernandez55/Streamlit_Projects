@@ -53,15 +53,12 @@ def download_files():
         if not os.path.exists(file_path):
             st.write(f"Downloading {file_name}...")
             try:
-                result = gdown.download(url, file_path, quiet=False)
-                if result is None:
-                    raise ValueError(f"Failed to download {file_name}: URL may be invalid or inaccessible.")
+                gdown.download(url, file_path, quiet=False)
                 st.success(f"Downloaded {file_name}")
             except Exception as e:
                 st.error(f"Failed to download {file_name}: {e}")
         else:
             st.write(f"{file_name} already exists.")
-
 
 # Run the file download function
 download_files()
