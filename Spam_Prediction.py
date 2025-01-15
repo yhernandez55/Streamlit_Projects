@@ -30,7 +30,8 @@ file_paths = {
 file_urls = {
     "Spam_Model.pkl": "https://drive.google.com/uc?id=17h6CL_3m22WtBrJQX7c5JMOhbbED1gNr",
     "tfidf_Vectorizer_Spam.pkl": "https://drive.google.com/uc?id=1Rp7KPNSO6q8KgUfSVQSxgVaryNmZn59k",
-    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=19AN9ZyqblDmwb3VzONajVkCVHi1fn-uZ"
+    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=19AN9ZyqblDmwb3VzONajVkCVHi1fn-uZ",
+    "spam.csv": "https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS"
 }
 
 # Project-1 (Spam Prediction)
