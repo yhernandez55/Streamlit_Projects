@@ -9,16 +9,17 @@
 # plotly==5.5.0
 # streamlit==1.18.0
 
-streamlit==1.18.0
-pandas
-joblib
-plotly
-gdown
-matplotlib
-nltk
-wordcloud
-numpy
-scipy
-pyfume
-tables
-blosc2
+streamlit==1.31.1
+altair==5.5.0
+pandas==2.2.3
+joblib==1.4.2
+plotly==5.24.1
+gdown==5.2.0
+matplotlib==3.10.0
+nltk==3.9.1
+wordcloud==1.9.4
+numpy==2.2.1
+scipy==1.15.1
+pyfume==0.3.1
+tables==3.10.2
+blosc2==3.0.0
