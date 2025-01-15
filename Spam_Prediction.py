@@ -5,6 +5,7 @@ import gdown
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
 
 # Base directory setup
 base_dir = os.path.dirname(os.path.abspath(__file__))
