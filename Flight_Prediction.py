@@ -5,6 +5,8 @@ import pandas as pd
 import joblib
 import plotly.express as px
 import gdown
+import sklearn
+
 
 # Base directory setup
 base_dir = os.path.dirname(os.path.abspath(__file__))
