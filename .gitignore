@@ -1,13 +1,14 @@
-# For the Modeling branch:
-
 # Ignore everything by default
 *
+
+# Track specific pickle files
+!pickled_data/xgb_pipeline_Flight.pkl
+!pickled_data/Evaluation_Metrics_Flight.pkl
 
 # Track the following model-related folders
 !Flight Model Notebooks/
 !Spam Model Notebooks/
 !Wine Model Notebooks/
-
 
 # Track .DS_Store (for branch-specific needs)
 !.DS_Store
