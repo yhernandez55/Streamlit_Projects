@@ -7,33 +7,14 @@ import plotly.express as px
 import gdown
 import sklearn
 
-
-# Base directory setup
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Define folder paths
-pickled_data_folder = os.path.join(base_dir, 'pickled_data')
-datasets_folder = os.path.join(base_dir, 'DataSets')
-
-# Ensure the required folders exist
-os.makedirs(pickled_data_folder, exist_ok=True)
-os.makedirs(datasets_folder, exist_ok=True)
-
-# File paths
-file_paths = {
-    "xgb_pipeline_Flight.pkl": os.path.join(pickled_data_folder, 'xgb_pipeline_Flight.pkl'),
-    "Eval_Metrics_Flight.pkl": os.path.join(pickled_data_folder, 'Eval_Metrics_Flight.pkl'),
-    "Airline_Clean_Dataset.csv": os.path.join(datasets_folder, 'Airline_Clean_Dataset.csv')
-}
-
 # Correct format URLs
 file_urls = {
-    "xgb_pipeline_Flight.pkl": "https://drive.google.com/uc?id=10pWyBmDDgU0fUL6BBkbP4QZyvSo3zprn",
-    "Eval_Metrics_Flight.pkl": "https://drive.google.com/uc?id=1nE6NlcdCDATh2PSf6aZ3IO4n3-sJANaC",
-    "Airline_Clean_Dataset.csv": "https://drive.google.com/uc?id=1hZwlOyubjj5RembXMu4a5BMoYmQBw5o_"
+    "xgb_pipeline_Flight.pkl": "https://drive.google.com/uc?id=1GjMlJBNgVCYWGBW_ZQZA_rgb7tIjbtkj",
+    "Eval_Metrics_Flight.pkl": "https://drive.google.com/uc?id=1y7iFQ6tfwhnm-5ozk91KZpa2ayrE_Ndt",
+    "Airline_Clean_Dataset.csv": "https://drive.google.com/uc?id=1K0VmhNjhLvyR2H_F2kAyfBemH2p5z0oz"
 }
 
-# Function to download the files using gdown
+# Function to download files from Google Drive
 def download_file(url, destination):
     try:
         # Try downloading the file using gdown
@@ -44,19 +25,25 @@ def download_file(url, destination):
         print(f"Error downloading file: {e}")
         raise
 
-# Ensure files are downloaded
-for file_name, file_path in file_paths.items():
-    if not os.path.exists(file_path):
-        download_file(file_urls[file_name], file_path)
+# Download files from Google Drive if not already present
+for file_name, file_url in file_urls.items():
+    if not os.path.exists(file_name):  # Check if the file already exists locally
+        download_file(file_url, file_name)
     else:
-        print(f"{file_name} already exists at {file_path}")
+        print(f"{file_name} already exists.")
 
-
+# Streamlit app to show flight prediction
 def show_flight_prediction():
-    # Load the trained pipeline, eval metrics and dataset
-    pipeline = joblib.load(file_paths["xgb_pipeline_Flight.pkl"])
-    df = pd.read_csv(file_paths["Airline_Clean_Dataset.csv"])
-    eval_metrics = joblib.load(file_paths["Eval_Metrics_Flight.pkl"])
+    # Load the trained pipeline, eval metrics, and dataset
+    pipeline = joblib.load("xgb_pipeline_Flight.pkl")
+    xgb_model = pipeline.named_steps['xgb_model']
+
+    # Load the dataset
+    df = pd.read_csv("Airline_Clean_Dataset.csv")
+    eval_metrics = joblib.load("Eval_Metrics_Flight.pkl")
+
+    # Ensure no GPU-related parameters are being set (we set tree_method='hist' for CPU)
+    xgb_model.set_params(tree_method='hist')  # Ensuring CPU mode
 
     # Header and dataset overview
     st.header('Predicting the Price of Flights')
