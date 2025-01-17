@@ -1,34 +1,19 @@
-# for the main branch:
+# for the modeling branch:
 
 # Ignore everything by default
 *
 
-# Track Python files
-!*.py
+# Track Jupyter notebooks
+!*.ipynb
 
-# Track images/ directory
-!images/
+# Track specific directories
+!Spam Model Notebooks/
+!Flight Model Notebooks/
+!Wine Model Notebooks/
 
-# Track requirements.txt
-!requirements.txt
-
-# Track .gitattributes
-!.gitattributes
-
-# Track .DS_Store
+# Track .gitignore, .DS_Store, etc.
+!.gitignore
 !.DS_Store
-
-# Track .devcontainer/ directory
-!.devcontainer/
-
-# Track README.md
 !README.md
-
-# Track __pycache__/ directory
 !__pycache__/
-
-# Ignore the pickled_data/ folder
-pickled_data/
-
-# Ignore the DataSets/ folder
-DataSets/
+!.devcontainer/
