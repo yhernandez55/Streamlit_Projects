@@ -3,15 +3,16 @@
 # Ignore everything by default
 *
 
-# Track Jupyter notebooks
+# Track Jupyter notebooks (all .ipynb files)
 !*.ipynb
 
-# Track specific directories
+# Track specific directories (no extra '!' needed here, just paths)
 !Streamlit_Projects/Spam Model Notebooks/
 !Streamlit_Projects/Flight Model Notebooks/
 !Streamlit_Projects/Wine Model Notebooks/
-!Streamlit_Projects/Flight Model Notebooks/
 
+# Track specific files inside ignored directories
+!Streamlit_Projects/Flight Model Notebooks/Airlinetrain.ipynb
 
 # Track .gitignore, .DS_Store, etc.
 !.gitignore
