@@ -5,7 +5,7 @@ description = "Portfolio showcasing Yanelly's projects and skills"
 authors = ["Yanelly <y35879597@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.11"  # Set the Python version you want (e.g., 3.8, 3.9)
+python = "^3.12"  # Set the Python version you want (e.g., 3.8, 3.9)
 streamlit = "^1.14.0"
 pandas = "1.3.3"
 scikit-learn = "1.0.2"
