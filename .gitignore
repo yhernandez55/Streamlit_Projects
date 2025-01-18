@@ -32,3 +32,6 @@ pickled_data/
 
 # Ignore the DataSets/ folder
 DataSets/
+
+# Track pyproject.toml file
+!pyproject.toml
