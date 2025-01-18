@@ -1,18 +1,17 @@
-# for the modeling branch:
-
 # Ignore everything by default
 *
 
 # Track Jupyter notebooks (all .ipynb files)
 !*.ipynb
 
-# Track specific directories (no extra '!' needed here, just paths)
-!Streamlit_Projects/Spam Model Notebooks/
+# Un-ignore specific directories
+!Streamlit_Projects/
 !Streamlit_Projects/Flight Model Notebooks/
-!Streamlit_Projects/Wine Model Notebooks/
-
-# Track specific files inside ignored directories
 !Streamlit_Projects/Flight Model Notebooks/Airlinetrain.ipynb
+
+# Track specific files in any directory
+!Streamlit_Projects/Spam Model Notebooks/
+!Streamlit_Projects/Wine Model Notebooks/
 
 # Track .gitignore, .DS_Store, etc.
 !.gitignore
