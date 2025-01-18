@@ -7,9 +7,11 @@
 !*.ipynb
 
 # Track specific directories
-!Spam Model Notebooks/
-!Flight Model Notebooks/
-!Wine Model Notebooks/
+!Streamlit_Projects/Spam Model Notebooks/
+!Streamlit_Projects/Flight Model Notebooks/
+!Streamlit_Projects/Wine Model Notebooks/
+!Streamlit_Projects/Flight Model Notebooks/
+
 
 # Track .gitignore, .DS_Store, etc.
 !.gitignore
