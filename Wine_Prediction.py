@@ -124,7 +124,7 @@ def show_wine_predictions():
     # Create and display wordcloud
     try:
         st.subheader('Wordcloud of Reviews')
-        df_cleaned['Cleaned_Lemma_Description'] = df_cleaned['Cleaned_Lemma_Description'].apply(
+        df_cleaned['Cleaned_Lemma_Description'] = df_cleaned['description'].apply(
             lambda x: ' '.join(x) if isinstance(x, list) else x
         )
         text_columns = ''.join(df_cleaned['Cleaned_Lemma_Description'])
