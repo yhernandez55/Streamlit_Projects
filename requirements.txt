@@ -8,5 +8,5 @@ xgboost>=1.7.6
 numpy>=1.21.0,<2.0.0 
 matplotlib>=3.3.0
 nltk>=3.6.0
-wordcloud>=1.8.0
+wordcloud>=1.8.0git
 category_encoders>=2.7.0
