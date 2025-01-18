@@ -32,11 +32,23 @@ for file_name, file_url in file_urls.items():
     else:
         print(f"{file_name} already exists.")
 
-# Streamlit app to show flight prediction
+
 def show_flight_prediction():
     # Load the trained pipeline, eval metrics, and dataset
     pipeline = joblib.load("xgb_pipeline_Flight.pkl")
     xgb_model = pipeline.named_steps['xgb_model']
+
+    # Check and ensure no GPU-related parameters are being set
+    model_params = xgb_model.get_params()
+    print("Current model parameters:", model_params)
+
+    # If gpu_id is set (indicating the model is using GPU), switch to CPU by setting gpu_id=-1
+    if 'gpu_id' in model_params and model_params['gpu_id'] != -1:
+        print("Model is set to use GPU, switching to CPU...")
+        xgb_model.set_params(gpu_id=-1)  # Force the model to use CPU
+
+    # Confirm the updated model parameters (after modification if any)
+    print("Updated model parameters:", xgb_model.get_params())
 
     # Load the dataset
     df = pd.read_csv("Airline_Clean_Dataset.csv")
