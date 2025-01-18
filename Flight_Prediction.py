@@ -9,8 +9,8 @@ import sklearn
 
 # Correct format URLs
 file_urls = {
-    "xgb_pipeline_Flight.pkl": "https://drive.google.com/uc?id=1GjMlJBNgVCYWGBW_ZQZA_rgb7tIjbtkj",
-    "Eval_Metrics_Flight.pkl": "https://drive.google.com/uc?id=1y7iFQ6tfwhnm-5ozk91KZpa2ayrE_Ndt",
+    "xgb_pipeline_Flight.pkl": "https://drive.google.com/uc?id=16y4-zCMv-Wz08U6N0jiOnYkaTLaGMQgf",
+    "Eval_Metrics_Flight.pkl": "https://drive.google.com/uc?id=1yjc-det_BHdhMPrKotkENdfHyG32lke9",
     "Airline_Clean_Dataset.csv": "https://drive.google.com/uc?id=1K0VmhNjhLvyR2H_F2kAyfBemH2p5z0oz"
 }
 

@@ -18,13 +18,13 @@ nltk.download("punkt")
 nltk.download("stopwords")
 nltk.download("wordnet")
 
-
+# 
 # File download URLs
 file_urls = {
-    "Wine_model.pkl": "https://drive.google.com/uc?id=1VXXIrbrY8d4wv92OwSVghoIF1VPr9uQ_",
-    "tfidf_Vectorizer_Wine.pkl": "https://drive.google.com/uc?id=1UUFuckBwFKIcyAdJwu_LkiU4aKb4momK",
-    "Evaluation_Metrics_Wine.pkl": "https://drive.google.com/uc?id=1vpP5DNFeWYd9HaaIH7FrpiOI1xg4AdOW",
-    "Cleaned_Wine_df.plk": "https://drive.google.com/uc?id=1B9aw0tOGTyB5r1pXgx9CciDQOJcKFRGr",
+    "Wine_model.pkl": "https://drive.google.com/uc?id=1V6TMaNw6-6DaS4YhkwCLV6ofXrbfXNtg",
+    "tfidf_Vectorizer_Wine.pkl": "https://drive.google.com/uc?id=1WV_1gxw2Uh26I12uJofxmAZeweVo3TSG",
+    "Evaluation_Metrics_Wine.pkl": "https://drive.google.com/uc?id=1qqVdqlZpt7-fal9tEotIt0WkOJ_sTWBR",
+    "Cleaned_Wine_df.plk": "https://drive.google.com/uc?id=1gXWCF9w-zAjNqJxQLw2wwQS16iSZAPqF",
     "winemag-data-130k-v2.csv": "https://drive.google.com/uc?id=1qd2rIjiqfx9dZ1q_aufpkwfZsl7u3DQb"
 }
 

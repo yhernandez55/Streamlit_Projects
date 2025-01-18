@@ -11,9 +11,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Define file URLs for downloading from Google Drive
 file_urls = {
-    "Spam_Model.pkl": "https://drive.google.com/uc?id=1ohkTbAU3teOVpIB-en3X4TCM9ER0DsXa", 
-    "tfidf_Vectorizer_Spam.pkl": "https://drive.google.com/uc?id=1tvmpktSYp3FZQSaJaS5zWg1CnJ_RKwtR",
-    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=1gI2-o8IDTxQKK4uzSNoeZqvTcUuRPgb3",
+    "Spam_Model.pkl": "https://drive.google.com/uc?id=1F2-eTIaAs8C2l5dD17EhBWTaFotZAvkK", 
+    "tfidf_Vectorizer_Spam.pkl": "https://drive.google.com/uc?id=1x7yaxTw6ytnW59m61Nn48h_5WkgGnh2h",
+    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=1rtIgfQ3XHGL88djwDbmvB_TKPp6hVZ4I",
     "spam.csv": "https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS"
 }
 
