@@ -1,14 +1,14 @@
 # import libraries
-import os
-import numpy as np
-import joblib
-import streamlit as st
 import nltk
+print(nltk.data.path)
 nltk.download("punkt")
 nltk.download("stopwords")
 nltk.download("wordnet")
 nltk.download("omw-1.4")  # For lemmatization
-
+import os
+import numpy as np
+import joblib
+import streamlit as st
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.tokenize import word_tokenize
