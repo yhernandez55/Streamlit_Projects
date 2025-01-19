@@ -1,11 +1,36 @@
-# import libraries
 import nltk
-print(nltk.data.path)
-nltk.download("punkt")
-nltk.download("stopwords")
-nltk.download("wordnet")
-nltk.download("omw-1.4")  # For lemmatization
 import os
+
+# Set the custom NLTK data directory
+nltk_data_dir = "/home/adminuser/nltk_data" 
+
+# Create the directory if it doesn't exist
+os.makedirs(nltk_data_dir, exist_ok=True)
+
+# Append the custom NLTK data directory to NLTK's search path
+nltk.data.path.append(nltk_data_dir)
+
+# Ensure necessary NLTK resources are downloaded
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt", download_dir=nltk_data_dir)
+
+try:
+    nltk.data.find("corpora/stopwords")
+except LookupError:
+    nltk.download("stopwords", download_dir=nltk_data_dir)
+
+try:
+    nltk.data.find("corpora/wordnet")
+except LookupError:
+    nltk.download("wordnet", download_dir=nltk_data_dir)
+
+try:
+    nltk.data.find("corpora/omw-1.4")
+except LookupError:
+    nltk.download("omw-1.4", download_dir=nltk_data_dir)
+
 import numpy as np
 import joblib
 import streamlit as st
