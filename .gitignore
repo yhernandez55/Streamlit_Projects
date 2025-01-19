@@ -19,3 +19,6 @@
 !README.md
 !__pycache__/
 !.devcontainer/
+
+# Ignore the DataSets/ folder
+DataSets/

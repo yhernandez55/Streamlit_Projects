@@ -1,9 +1,9 @@
 # import libraries
+import os
 import numpy as np
 import joblib
 import streamlit as st
 import nltk
-import os
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.tokenize import word_tokenize
@@ -14,39 +14,49 @@ import matplotlib.pyplot as plt
 import gdown
 
 # Download necessary NLTK resources
-nltk.download("punkt")
-nltk.download("stopwords")
-nltk.download("wordnet")
+@st.cache_resource
+def download_nltk_resources():
+    nltk.download("punkt")
+    nltk.download("stopwords")
+    nltk.download("wordnet")
 
+download_nltk_resources()
 
 # File download URLs
 file_urls = {
-    "Wine_model.pkl": "https://drive.google.com/uc?id=1VXXIrbrY8d4wv92OwSVghoIF1VPr9uQ_",
-    "tfidf_Vectorizer_Wine.pkl": "https://drive.google.com/uc?id=1UUFuckBwFKIcyAdJwu_LkiU4aKb4momK",
-    "Evaluation_Metrics_Wine.pkl": "https://drive.google.com/uc?id=1vpP5DNFeWYd9HaaIH7FrpiOI1xg4AdOW",
-    "Cleaned_Wine_df.plk": "https://drive.google.com/uc?id=1B9aw0tOGTyB5r1pXgx9CciDQOJcKFRGr",
+    "Wine_model.pkl": "https://drive.google.com/uc?id=1V6TMaNw6-6DaS4YhkwCLV6ofXrbfXNtg",
+    "tfidf_Vectorizer_Wine.pkl": "https://drive.google.com/uc?id=1WV_1gxw2Uh26I12uJofxmAZeweVo3TSG",
+    "Evaluation_Metrics_Wine.pkl": "https://drive.google.com/uc?id=1qqVdqlZpt7-fal9tEotIt0WkOJ_sTWBR",
+    "Cleaned_Wine_df.plk": "https://drive.google.com/uc?id=1gXWCF9w-zAjNqJxQLw2wwQS16iSZAPqF",
     "winemag-data-130k-v2.csv": "https://drive.google.com/uc?id=1qd2rIjiqfx9dZ1q_aufpkwfZsl7u3DQb"
 }
 
-# Function to download files from Google Drive
+# Function to download files if not present locally
+@st.cache_resource
 def download_file(url, destination):
-    try:
-        # Try downloading the file using gdown
-        print(f"Attempting to download from {url} to {destination}...")
+    if not os.path.exists(destination):
         gdown.download(url, destination, quiet=False)
-        print(f"Download successful: {destination}")
-    except Exception as e:
-        print(f"Error downloading file: {e}")
-        raise
+    return destination
 
-# Download files from Google Drive if not already present
+# Download all files
 for file_name, file_url in file_urls.items():
-    if not os.path.exists(file_name):  # Check if the file already exists locally
-        download_file(file_url, file_name)
-    else:
-        print(f"{file_name} already exists.")
+    download_file(file_url, file_name)
+    
+# Cached resources loader
+@st.cache_resource
+def load_model(file_name):
+    return joblib.load(file_name)
 
-# Function to preprocess text input
+@st.cache_resource
+def load_dataset(file_name):
+    return pd.read_csv(file_name)
+
+@st.cache_data
+def load_cleaned_data(file_name):
+    return joblib.load(file_name)
+
+# Text preprocessing function
+@st.cache_data
 def preprocess_text(text):
     stop_words = set(stopwords.words("english")).union({",", "."})
     lemmatizer = WordNetLemmatizer()
@@ -57,19 +67,12 @@ def preprocess_text(text):
 
 # Main function to show wine predictions
 def show_wine_predictions():
-    """
-    This function will display the wine sentiment prediction page and handle the wine review input,
-    preprocess the review, and make predictions using a pre-trained model.
-    """
-    # Load the necessary resources
-    try:
-        wine_model = joblib.load("Wine_model.pkl")
-        tfidf_vectorizer = joblib.load("tfidf_Vectorizer_Wine.pkl")
-        accuracy, class_report = joblib.load("Evaluation_Metrics_Wine.pkl")
-        df_cleaned = joblib.load("Cleaned_Wine_df.plk")
-    except Exception as e:
-        st.error(f"Failed to load files: {e}")
-        return
+    # Load cached resources
+    wine_model = load_model("Wine_model.pkl")
+    tfidf_vectorizer = load_model("tfidf_Vectorizer_Wine.pkl")
+    accuracy, class_report = load_model("Evaluation_Metrics_Wine.pkl")
+    df_cleaned = load_cleaned_data("Cleaned_Wine_df.plk")
+    raw_data = load_dataset("winemag-data-130k-v2.csv")
 
     # Streamlit App Title
     st.title("Wine Review Sentiment Analysis")
@@ -82,21 +85,13 @@ def show_wine_predictions():
         if input_review.strip():  # Check if the input is not empty
             # Preprocess input review
             preprocessed_review = preprocess_text(input_review)
-            
+
             # Transform with TF-IDF using the existing vectorizer
             try:
                 input_review_transformed = tfidf_vectorizer.transform([preprocessed_review])
-                streamlit_features = set(tfidf_vectorizer.get_feature_names_out())
 
-                # Ensure the number of features matches the model expectations
-                if input_review_transformed.shape[1] != wine_model.n_features_in_:
-                    st.error(f"Feature mismatch: Expected {wine_model.n_features_in_} features but got {input_review_transformed.shape[1]}")
-                    return
-                
                 # Predict sentiment
                 wine_pred = wine_model.predict(input_review_transformed)
-                
-                # Display prediction result
                 if wine_pred[0] == 1:
                     st.success("This is a Positive review!")
                 else:
@@ -105,26 +100,22 @@ def show_wine_predictions():
                 st.error(f"Error during transformation or prediction: {e}")
         else:
             st.warning("Please enter a valid review.")
-            
-    # Load raw and cleaned data
-    try:
-        df = pd.read_csv("winemag-data-130k-v2.csv")
-        df = df.drop(['Unnamed: 0', 'country', 'designation', 'points', 'price', 
-                      'province', 'region_1', 'region_2', 'variety'], axis=1)
-        st.subheader('The Actual DataFrame (Uncleaned)')
-        st.dataframe(df)
 
-        df_cleaned = df_cleaned.drop(['Unnamed: 0', 'country', 'designation', 'points', 
-                                      'price', 'province', 'region_1', 'region_2', 'variety'], axis=1)
+    # Raw and cleaned data overview
+    st.subheader("Dataset Overview")
+    try:
+        st.subheader('The Actual DataFrame (Uncleaned)')
+        st.dataframe(raw_data.head(10))
+
         st.subheader('Cleaned DataFrame')
-        st.dataframe(df_cleaned)
+        st.dataframe(df_cleaned.head(10))
     except Exception as e:
         st.error(f"Error loading or processing dataframes: {e}")
-        
+
     # Create and display wordcloud
+    st.subheader("Wordcloud of Reviews")
     try:
-        st.subheader('Wordcloud of Reviews')
-        df_cleaned['Cleaned_Lemma_Description'] = df_cleaned['Cleaned_Lemma_Description'].apply(
+        df_cleaned['Cleaned_Lemma_Description'] = df_cleaned['description'].apply(
             lambda x: ' '.join(x) if isinstance(x, list) else x
         )
         text_columns = ''.join(df_cleaned['Cleaned_Lemma_Description'])
@@ -136,10 +127,10 @@ def show_wine_predictions():
         st.pyplot(fig)
     except Exception as e:
         st.error(f"Error generating wordcloud: {e}")
-        
+
     # Model evaluation metrics
+    st.subheader("Model Evaluation Metrics")
     try:
-        st.subheader("Model Evaluation Metrics")
         st.write(f"Accuracy: {accuracy:.2f}")
         st.text("Classification Report:")
         st.text(class_report)

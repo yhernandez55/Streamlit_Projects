@@ -9,41 +9,49 @@ import sklearn
 
 # Correct format URLs
 file_urls = {
-    "xgb_pipeline_Flight.pkl": "https://drive.google.com/uc?id=1GjMlJBNgVCYWGBW_ZQZA_rgb7tIjbtkj",
-    "Eval_Metrics_Flight.pkl": "https://drive.google.com/uc?id=1y7iFQ6tfwhnm-5ozk91KZpa2ayrE_Ndt",
+    "xgb_pipeline_Flight.pkl": "https://drive.google.com/uc?id=1AqBoCoK5e62MR4nyqREuZnENjAviLhe9",
+    "Eval_Metrics_Flight.pkl": "https://drive.google.com/uc?id=1PErZ9vi18D3ORiTk0SScwpG5dkPSn7K_",
     "Airline_Clean_Dataset.csv": "https://drive.google.com/uc?id=1K0VmhNjhLvyR2H_F2kAyfBemH2p5z0oz"
 }
 
-# Function to download files from Google Drive
-def download_file(url, destination):
-    try:
-        # Try downloading the file using gdown
-        print(f"Attempting to download from {url} to {destination}...")
-        gdown.download(url, destination, quiet=False)
-        print(f"Download successful: {destination}")
-    except Exception as e:
-        print(f"Error downloading file: {e}")
-        raise
+# Function to download and get file from Google Drive
+@st.cache_resource
+def download_and_get_file(file_url, file_name):
+    if not os.path.exists(file_name):  # Check if the file exists locally
+        gdown.download(file_url, file_name, quiet=False)
+    return file_name
 
-# Download files from Google Drive if not already present
-for file_name, file_url in file_urls.items():
-    if not os.path.exists(file_name):  # Check if the file already exists locally
-        download_file(file_url, file_name)
-    else:
-        print(f"{file_name} already exists.")
+# Cached dataset loader
+@st.cache_data
+def load_flight_dataset(file_name):
+    df = pd.read_csv(file_name)
+    # Optimize data types for memory efficiency
+    df['stops'] = df['stops'].astype('category')
+    df['airline'] = df['airline'].astype('category')
+    df['source_city'] = df['source_city'].astype('category')
+    df['destination_city'] = df['destination_city'].astype('category')
+    df['class'] = df['class'].astype('category')
+    return df
 
-# Streamlit app to show flight prediction
+# Cached model loader
+@st.cache_resource
+def load_flight_model(file_name):
+    return joblib.load(file_name)
+
 def show_flight_prediction():
-    # Load the trained pipeline, eval metrics, and dataset
-    pipeline = joblib.load("xgb_pipeline_Flight.pkl")
+    # Download and load files
+    flight_model_file = download_and_get_file(file_urls["xgb_pipeline_Flight.pkl"], "xgb_pipeline_Flight.pkl")
+    eval_metrics_file = download_and_get_file(file_urls["Eval_Metrics_Flight.pkl"], "Eval_Metrics_Flight.pkl")
+    dataset_file = download_and_get_file(file_urls["Airline_Clean_Dataset.csv"], "Airline_Clean_Dataset.csv")
+
+    # Load the trained pipeline, evaluation metrics, and dataset
+    pipeline = load_flight_model(flight_model_file)
+    df = load_flight_dataset(dataset_file)
+    eval_metrics = load_flight_model(eval_metrics_file)  # eval_metrics is also a pickle file
+
+    # Force the XGBoost model to use CPU
     xgb_model = pipeline.named_steps['xgb_model']
-
-    # Load the dataset
-    df = pd.read_csv("Airline_Clean_Dataset.csv")
-    eval_metrics = joblib.load("Eval_Metrics_Flight.pkl")
-
-    # Ensure no GPU-related parameters are being set (we set tree_method='hist' for CPU)
-    xgb_model.set_params(tree_method='hist')  # Ensuring CPU mode
+    xgb_model.set_params(gpu_id=-1, tree_method='hist')  # Ensure CPU mode
 
     # Header and dataset overview
     st.header('Predicting the Price of Flights')
@@ -67,7 +75,7 @@ def show_flight_prediction():
                         min_value=int(df['days_left'].min()), 
                         max_value=int(df['days_left'].max()), 
                         step=1)
-
+    
     # Prediction button
     if st.button('Predict Flight Price'):
         # Create input DataFrame for prediction
@@ -82,7 +90,6 @@ def show_flight_prediction():
             'duration': [duration],
             'days_left': [days_left]
         })
-
         # Debug: Display user input data
         st.write("User input data:", user_input_data)
 

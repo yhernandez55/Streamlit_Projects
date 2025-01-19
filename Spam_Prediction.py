@@ -5,55 +5,63 @@ import gdown
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Define file URLs for downloading from Google Drive
 file_urls = {
-    "Spam_Model.pkl": "https://drive.google.com/uc?id=1ohkTbAU3teOVpIB-en3X4TCM9ER0DsXa", 
-    "tfidf_Vectorizer_Spam.pkl": "https://drive.google.com/uc?id=1tvmpktSYp3FZQSaJaS5zWg1CnJ_RKwtR",
-    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=1gI2-o8IDTxQKK4uzSNoeZqvTcUuRPgb3",
+    "Spam_Model.pkl": "https://drive.google.com/uc?id=1F2-eTIaAs8C2l5dD17EhBWTaFotZAvkK", 
+    "tfidf_Vectorizer_Spam.pkl": "https://drive.google.com/uc?id=1x7yaxTw6ytnW59m61Nn48h_5WkgGnh2h",
+    "Evaluation_Metrics_Spam.pkl": "https://drive.google.com/uc?id=1rtIgfQ3XHGL88djwDbmvB_TKPp6hVZ4I",
     "spam.csv": "https://drive.google.com/uc?id=1QuR2MJhxOtqdAZz6WJ_9LaK2-zWs3vLS"
 }
 
 # Function to download files from Google Drive
+@st.cache_resource
 def download_file(url, destination):
-    try:
-        # Try downloading the file using gdown
-        print(f"Attempting to download from {url} to {destination}...")
+    if not os.path.exists(destination):
         gdown.download(url, destination, quiet=False)
-        print(f"Download successful: {destination}")
-    except Exception as e:
-        print(f"Error downloading file: {e}")
-        raise
+    return destination
 
-# Download files from Google Drive if not already present
+# Download and cache all files
 for file_name, file_url in file_urls.items():
-    if not os.path.exists(file_name):  # Check if the file already exists locally
-        download_file(file_url, file_name)
-    else:
-        print(f"{file_name} already exists.")
+    download_file(file_url, file_name)
+    
+# Load resources with caching
+@st.cache_resource
+def load_model(file_name):
+    return joblib.load(file_name)
 
-# Project: Spam Prediction
+@st.cache_data
+def load_dataset(file_name):
+    return pd.read_csv(file_name, encoding="latin-1")
+@st.cache_data
+def preprocess_dataset(df):
+    df = df.drop(['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], axis=1)
+    df = df[['v1', 'v2']].rename(columns={'v1': 'label', 'v2': 'message'})
+    df['label'] = df['label'].apply(lambda x: 1 if x == 'spam' else 0)
+    return df
+
+@st.cache_resource
+def load_vectorizer(file_name):
+    tfidf = joblib.load(file_name)
+    if not hasattr(tfidf, 'idf_'):
+        df = preprocess_dataset(load_dataset("spam.csv"))
+        tfidf = TfidfVectorizer(stop_words=stopwords.words('english'))
+        tfidf.fit_transform(df['message'])
+        joblib.dump(tfidf, file_name)  # Save the fitted vectorizer
+    return tfidf
+
+# Spam Prediction function
 def show_spam_project():
     st.header("Finding if a Message is Spam")
     st.subheader("Spam is 1 and ham is 0")
 
     # Load the model, vectorizer, and evaluation metrics
-    spam_model = joblib.load("Spam_Model.pkl")
-    tfidf = joblib.load("tfidf_Vectorizer_Spam.pkl")
-
-    # In case the vectorizer is not fitted, re-fit it
-    if not hasattr(tfidf, 'idf_'):
-        st.warning("TF-IDF Vectorizer is not fitted! Re-fitting...")
-        df = pd.read_csv("spam.csv", encoding="latin-1")
-        df = df.rename(columns={'v1': 'label', 'v2': 'message'})
-        df['label'] = df['label'].apply(lambda x: 1 if x == 'spam' else 0)
-        tfidf = TfidfVectorizer(stop_words=stopwords.words('english'))
-        X = tfidf.fit_transform(df['message'])
-        joblib.dump(tfidf, "tfidf_Vectorizer_Spam.pkl")  # Save the re-fitted vectorizer
-
-    eval_metrics = joblib.load("Evaluation_Metrics_Spam.pkl")
+    spam_model = load_model("Spam_Model.pkl")
+    tfidf = load_vectorizer("tfidf_Vectorizer_Spam.pkl")
+    eval_metrics = load_model("Evaluation_Metrics_Spam.pkl")
 
     # Making prediction
     input_message = st.text_input("Enter your message please")
@@ -66,16 +74,17 @@ def show_spam_project():
             else:
                 st.success("This message is Not spam")
             st.write(f"The predicted message is: {pred[0]}")
+        else:
+            st.warning("Please enter a valid message.")
 
-    # Data loading and displaying
+    # Load and preprocess dataset
     try:
-        df = pd.read_csv("spam.csv", sep=',', encoding='latin-1')
-        df = df.drop(['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], axis=1)
-        df = df[['v1', 'v2']].rename(columns={'v1': 'label', 'v2': 'message'})
-        df['label'] = df['label'].apply(lambda x: 1 if x == 'spam' else 0)
-        st.dataframe(df)
+        df = preprocess_dataset(load_dataset("spam.csv"))
+        st.subheader("Dataset Overview")
+        st.dataframe(df.head(10))
     except FileNotFoundError:
         st.error("Spam dataset is missing. Please check the download link.")
+        return
 
     # Visualizations: bar plot
     spam_counts = df['label'].value_counts()
