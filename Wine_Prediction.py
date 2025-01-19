@@ -6,6 +6,9 @@ import streamlit as st
 import nltk
 nltk.download("punkt")
 nltk.download("stopwords")
+nltk.download("wordnet")
+nltk.download("omw-1.4")  # For lemmatization
+
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.tokenize import word_tokenize
@@ -61,6 +64,7 @@ def preprocess_text(text):
         nltk.data.find("corpora/stopwords")
     except LookupError:
         nltk.download("stopwords")
+        
     stop_words = set(stopwords.words("english")).union({",", "."})
     lemmatizer = WordNetLemmatizer()
     tokens = word_tokenize(text)  # Tokenize
