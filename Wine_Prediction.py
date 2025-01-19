@@ -13,15 +13,6 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import gdown
 
-# Download necessary NLTK resources
-@st.cache_resource
-def download_nltk_resources():
-    nltk.download("punkt")
-    nltk.download("stopwords")
-    nltk.download("wordnet")
-
-download_nltk_resources()
-
 # File download URLs
 file_urls = {
     "Wine_model.pkl": "https://drive.google.com/uc?id=1V6TMaNw6-6DaS4YhkwCLV6ofXrbfXNtg",
@@ -58,6 +49,16 @@ def load_cleaned_data(file_name):
 # Text preprocessing function
 @st.cache_data
 def preprocess_text(text):
+    # Ensure NLTK resources are downloaded
+    try:
+        nltk.data.find("tokenizers/punkt")
+    except LookupError:
+        nltk.download("punkt")
+
+    try:
+        nltk.data.find("corpora/stopwords")
+    except LookupError:
+        nltk.download("stopwords")
     stop_words = set(stopwords.words("english")).union({",", "."})
     lemmatizer = WordNetLemmatizer()
     tokens = word_tokenize(text)  # Tokenize
