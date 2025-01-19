@@ -4,6 +4,8 @@ import numpy as np
 import joblib
 import streamlit as st
 import nltk
+nltk.download("punkt")
+nltk.download("stopwords")
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.tokenize import word_tokenize
