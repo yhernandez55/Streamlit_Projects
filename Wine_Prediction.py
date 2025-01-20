@@ -1,36 +1,5 @@
-import nltk
 import os
-
-# Set the custom NLTK data directory
-nltk_data_dir = "/home/adminuser/nltk_data" 
-
-# Create the directory if it doesn't exist
-os.makedirs(nltk_data_dir, exist_ok=True)
-
-# Append the custom NLTK data directory to NLTK's search path
-nltk.data.path.append(nltk_data_dir)
-
-# Ensure necessary NLTK resources are downloaded
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt", download_dir=nltk_data_dir)
-
-try:
-    nltk.data.find("corpora/stopwords")
-except LookupError:
-    nltk.download("stopwords", download_dir=nltk_data_dir)
-
-try:
-    nltk.data.find("corpora/wordnet")
-except LookupError:
-    nltk.download("wordnet", download_dir=nltk_data_dir)
-
-try:
-    nltk.data.find("corpora/omw-1.4")
-except LookupError:
-    nltk.download("omw-1.4", download_dir=nltk_data_dir)
-
+import nltk
 import numpy as np
 import joblib
 import streamlit as st
@@ -42,6 +11,24 @@ from nltk.stem import WordNetLemmatizer
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import gdown
+
+# Set the custom NLTK data directory
+nltk_data_dir = os.path.join(os.path.expanduser("~"), "nltk_data")
+
+# Create the directory if it doesn't exist
+os.makedirs(nltk_data_dir, exist_ok=True)
+
+# Append the custom NLTK data directory to NLTK's search path
+nltk.data.path.append(nltk_data_dir)
+
+# Force download missing NLTK resources to avoid errors
+nltk.download("punkt", download_dir=nltk_data_dir, force=True)
+nltk.download("stopwords", download_dir=nltk_data_dir, force=True)
+nltk.download("wordnet", download_dir=nltk_data_dir, force=True)
+nltk.download("omw-1.4", download_dir=nltk_data_dir, force=True)
+
+# Verify the contents of the NLTK corpora directory
+print(f"Contents of corpora directory: {os.listdir(os.path.join(nltk_data_dir, 'corpora'))}")
 
 # File download URLs
 file_urls = {
@@ -62,7 +49,7 @@ def download_file(url, destination):
 # Download all files
 for file_name, file_url in file_urls.items():
     download_file(file_url, file_name)
-    
+
 # Cached resources loader
 @st.cache_resource
 def load_model(file_name):
@@ -79,17 +66,13 @@ def load_cleaned_data(file_name):
 # Text preprocessing function
 @st.cache_data
 def preprocess_text(text):
-    # Ensure NLTK resources are downloaded
+    # Ensure NLTK resources are downloaded (only do this once)
     try:
         nltk.data.find("tokenizers/punkt")
     except LookupError:
-        nltk.download("punkt")
+        nltk.download("punkt", download_dir=nltk_data_dir)
 
-    try:
-        nltk.data.find("corpora/stopwords")
-    except LookupError:
-        nltk.download("stopwords")
-        
+    # Process the text (tokenization, stopwords removal, lemmatization)
     stop_words = set(stopwords.words("english")).union({",", "."})
     lemmatizer = WordNetLemmatizer()
     tokens = word_tokenize(text)  # Tokenize
@@ -168,3 +151,7 @@ def show_wine_predictions():
         st.text(class_report)
     except Exception as e:
         st.error(f"Error displaying evaluation metrics: {e}")
+
+# Run the Streamlit app
+if __name__ == "__main__":
+    show_wine_predictions()
