@@ -34,9 +34,12 @@ Welcome to the Streamlit Projects repository! This mini-project collection demon
   To explore the projects locally, follow these steps:
   - Python 3.11+ (recommended)
   - It is recommended that a virtual environment be used to avoid dependency conflicts.
-
+    
+  ### Live Demo
+  You can view the live portfolio here: [Streamlit Portfolio](https://appprojects-gx243jxfrxhdqcye4agcdn.streamlit.app/)
+  
   ### Installation
-
+  Alternatively, you can follow these steps to install it.
   ```bash
   # Clone the repository
   git clone https://github.com/yhernandez55/Streamlit_Projects.git
@@ -59,5 +62,4 @@ Welcome to the Streamlit Projects repository! This mini-project collection demon
   # Run the Streamlit app
   streamlit run YanellyHernandez.py 
 
-## Live Demo
-Alternatively, you can view the live portfolio here: [Streamlit Portfolio](https://appprojects-gx243jxfrxhdqcye4agcdn.streamlit.app/)
+
