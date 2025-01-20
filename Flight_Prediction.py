@@ -52,9 +52,9 @@ def show_flight_prediction():
     df = load_flight_dataset(dataset_file)
     eval_metrics = load_flight_model(eval_metrics_file)  # eval_metrics is also a pickle file
 
-    # Force the XGBoost model to use CPU
+    # Force the XGBoost model to use a CPU-compatible tree method
     xgb_model = pipeline.named_steps['xgb_model']
-    xgb_model.set_params(gpu_id=-1, tree_method='hist')  # Ensure CPU mode
+    xgb_model.set_params(tree_method='hist')  # Use CPU-compatible tree method
 
     # Header and dataset overview
     st.header('Predicting the Price of Flights')
