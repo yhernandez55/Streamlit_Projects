@@ -23,6 +23,7 @@ nltk.data.path.append(nltk_data_dir)
 
 # Force download missing NLTK resources to avoid errors
 nltk.download("punkt", download_dir=nltk_data_dir, force=True)
+nltk.download("punkt_tab", download_dir=nltk_data_dir, force=True)  # Explicitly downloading punkt_tab
 nltk.download("stopwords", download_dir=nltk_data_dir, force=True)
 nltk.download("wordnet", download_dir=nltk_data_dir, force=True)
 nltk.download("omw-1.4", download_dir=nltk_data_dir, force=True)
@@ -66,11 +67,16 @@ def load_cleaned_data(file_name):
 # Text preprocessing function
 @st.cache_data
 def preprocess_text(text):
-    # Ensure NLTK resources are downloaded (only do this once)
+    # Ensure NLTK resources are downloaded
     try:
         nltk.data.find("tokenizers/punkt")
     except LookupError:
         nltk.download("punkt", download_dir=nltk_data_dir)
+
+    try:
+        nltk.data.find("tokenizers/punkt_tab")
+    except LookupError:
+        nltk.download("punkt_tab", download_dir=nltk_data_dir)
 
     # Process the text (tokenization, stopwords removal, lemmatization)
     stop_words = set(stopwords.words("english")).union({",", "."})
