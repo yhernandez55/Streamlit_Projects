@@ -1,6 +1,9 @@
 # import libraries:
 import os
 import streamlit as st
+import xgboost as xgb
+# Display the XGBoost version
+st.write("XGBoost version:", xgb.__version__)
 import pandas as pd
 import joblib
 import plotly.express as px
