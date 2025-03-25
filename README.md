@@ -37,6 +37,10 @@ Welcome to the Streamlit Projects repository! This mini-project collection demon
     
   ### Live Demo
   You can view the live portfolio here: [Streamlit Portfolio](https://appprojects-gx243jxfrxhdqcye4agcdn.streamlit.app/)
+
+  #### Hosted on Streamlit (Free Version):
+  This app is hosted on Streamlit’s free tier, which means that it may go to sleep after a period of inactivity. If you visit the link and the app is in sleep mode, it will take a few seconds to wake up.
+
   
   ### Installation
   Alternatively, you can follow these steps to install it.
